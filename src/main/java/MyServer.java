@@ -2,6 +2,9 @@ import java.net.*;
 import java.io.*;
 
 public class MyServer {
+    private final static int first = 0;
+    private final static int second = 2;
+
     public static void main(String[] args) throws IOException {
         ServerSocket serverSocket = new ServerSocket(9999);
         System.out.println("Server start!");
@@ -12,9 +15,11 @@ public class MyServer {
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
             String request = reader.readLine();
 
-            String response = "length your SMS is " + request.length();
-            writer.write(response);
-            writer.newLine();
+            int rand = first + (int) (Math.random() * second);
+            String str = " " + request.length() + "\n";
+
+            writer.write(rand);
+            writer.write(str);
             writer.flush();
 
             writer.close();

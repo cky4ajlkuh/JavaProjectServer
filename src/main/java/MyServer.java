@@ -13,14 +13,18 @@ public class MyServer {
         System.out.println("Server start!");
         try (ServerSocket serverSocket = new ServerSocket(9999)) {
             Socket client = serverSocket.accept();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(client.getInputStream()));
+            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(client.getOutputStream()));
             while (!client.isClosed()) {
-                //Socket client = serverSocket.accept();
                 executeIt.execute(new Server1(client));
             }
             executeIt.shutdown();
+            reader.close();
+            writer.close();
+            client.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
+
 }

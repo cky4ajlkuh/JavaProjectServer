@@ -2,14 +2,6 @@ import java.io.*;
 import java.net.*;
 import java.util.LinkedList;
 
-/**
- * проект реализует консольный многопользовательский чат.
- * вход в программу запуска сервера - в классе Server.
- *
- * @author izotopraspadov, the tech
- * @version 2.0
- */
-
 class ServerSomthing extends Thread {
 
     private Socket socket;
@@ -50,17 +42,11 @@ class ServerSomthing extends Thread {
             } catch (NullPointerException ignored) {
             }
 
-
         } catch (IOException e) {
             this.downService();
         }
     }
 
-    /**
-     * отсылка одного сообщения клиенту по указанному потоку
-     *
-     * @param msg
-     */
     private void send(String msg) {
         try {
             out.write(msg + "\n");
@@ -69,11 +55,6 @@ class ServerSomthing extends Thread {
         }
 
     }
-
-    /**
-     * закрытие сервера
-     * прерывание себя как нити и удаление из списка нитей
-     */
     private void downService() {
         try {
             if (!socket.isClosed()) {
@@ -89,11 +70,6 @@ class ServerSomthing extends Thread {
         }
     }
 }
-
-/**
- * класс хранящий в ссылочном приватном
- * списке информацию о последних 10 (или меньше) сообщениях
- */
 
 class Story {
 

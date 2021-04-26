@@ -1,30 +1,70 @@
+import java.lang.reflect.Array;
 import java.net.*;
 import java.io.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.LinkedList;
 
 public class MyServer {
-    private final static int first = 0;
-    private final static int second = 2;
 
-    static ExecutorService executeIt = Executors.newFixedThreadPool(2);
+    public static final int PORT = 9999;
+    public static LinkedList<MyServerRun> serverList = new LinkedList<>();
 
     public static void main(String[] args) throws IOException {
-        System.out.println("Server start!");
-        try (ServerSocket serverSocket = new ServerSocket(9999)) {
-            Socket client = serverSocket.accept();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(client.getInputStream()));
-            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(client.getOutputStream()));
-            while (!client.isClosed()) {
-                executeIt.execute(new Server1(client));
+        ServerSocket server = new ServerSocket(PORT);
+        System.out.println("Server Started");
+        try {
+            while (true) {
+                Socket socket = server.accept();
+                try {
+                    serverList.add(new MyServerRun(socket));
+                } catch (IOException e) {
+                    socket.close();
+                }
             }
-            executeIt.shutdown();
-            reader.close();
-            writer.close();
-            client.close();
+        } finally {
+            server.close();
+        }
+    }
+}
+
+class MyServerRun extends Thread {
+    private Socket socket;
+    private BufferedReader in;
+    private BufferedWriter out;
+
+    MyServerRun(Socket socket) throws IOException {
+        this.socket = socket;
+        in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+        send(new char[]{'0','0','X'});
+    }
+
+    @Override
+    public void run() {
+        try {
+            String str = in.readLine();
+            System.out.println(str);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
+    private void downService() {
+        try {
+            if (!socket.isClosed()) {
+                socket.close();
+                in.close();
+                out.close();
+            }
+        } catch (IOException ignored) {
+        }
+    }
+
+    private void send(char[] array) {
+        try {
+            String str = array[0] + " " + array[1] + " " +array[2];
+            out.write( str + "\n");
+            out.flush();
+        } catch (IOException ignored) {
+        }
+    }
 }

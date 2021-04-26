@@ -35,14 +35,18 @@ class MyServerRun extends Thread {
         this.socket = socket;
         in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
-        send(new char[]{'0','0','X'});
+        start();
+        // new readArray();
+        //send(new char[]{'0','0','X'});
     }
 
     @Override
     public void run() {
         try {
-            String str = in.readLine();
-            System.out.println(str);
+            while (!socket.isClosed()){
+                char[] str = in.readLine().toCharArray();
+                System.out.println(str);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }

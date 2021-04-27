@@ -1,4 +1,3 @@
-import java.lang.reflect.Array;
 import java.net.*;
 import java.io.*;
 import java.util.LinkedList;
@@ -27,15 +26,20 @@ public class MyServer {
 }
 
 class MyServerRun extends Thread {
-    private Socket socket;
-    private BufferedReader in;
-    private BufferedWriter out;
+    private final Socket socket;
+    private final BufferedReader in;
+    private final BufferedWriter out;
+    int random_number = (int) (Math.random() * 2);
 
     MyServerRun(Socket socket) throws IOException {
         this.socket = socket;
         in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+        out.write(random_number);
+        out.flush();
+
         start();
+
         // new readArray();
         //send(new char[]{'0','0','X'});
     }
@@ -43,7 +47,7 @@ class MyServerRun extends Thread {
     @Override
     public void run() {
         try {
-            while (!socket.isClosed()){
+            while (!socket.isClosed()) {
                 char[] str = in.readLine().toCharArray();
                 System.out.println(str);
             }
@@ -65,8 +69,8 @@ class MyServerRun extends Thread {
 
     private void send(char[] array) {
         try {
-            String str = array[0] + " " + array[1] + " " +array[2];
-            out.write( str + "\n");
+            String str = array[0] + " " + array[1] + " " + array[2];
+            out.write(str + "\n");
             out.flush();
         } catch (IOException ignored) {
         }

@@ -30,6 +30,7 @@ class MyServerRun extends Thread {
     private final BufferedReader in;
     private final BufferedWriter out;
     int random_number = (int) (Math.random() * 2);
+    char[] str;
 
     MyServerRun(Socket socket) throws IOException {
         this.socket = socket;
@@ -37,19 +38,16 @@ class MyServerRun extends Thread {
         out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
         out.write(random_number);
         out.flush();
-
         start();
-
-        // new readArray();
-        //send(new char[]{'0','0','X'});
     }
 
     @Override
     public void run() {
         try {
             while (!socket.isClosed()) {
-                char[] str = in.readLine().toCharArray();
+                str = in.readLine().toCharArray();
                 System.out.println(str);
+                send(str);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -69,7 +67,7 @@ class MyServerRun extends Thread {
 
     private void send(char[] array) {
         try {
-            String str = array[0] + " " + array[1] + " " + array[2];
+            String str = array[0] + " " + array[2] + " " + array[4];
             out.write(str + "\n");
             out.flush();
         } catch (IOException ignored) {

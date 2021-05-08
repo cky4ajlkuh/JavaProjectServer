@@ -11,11 +11,11 @@ public class MyServer {
         ServerSocket server = new ServerSocket(PORT);
         System.out.println("Server Started");
         try {
-            while (true) {
+            while (serverList.size() < 2) {
                 Socket socket = server.accept();
                 try {
                     serverList.add(new MyServerRun(socket));
-                } catch (IOException e) {
+                } catch (IOException | InterruptedException e) {
                     socket.close();
                 }
             }
@@ -32,11 +32,11 @@ class MyServerRun extends Thread {
     int random_number = (int) (Math.random() * 2);
     char[] str;
 
-    MyServerRun(Socket socket) throws IOException {
+    MyServerRun(Socket socket) throws IOException, InterruptedException {
         this.socket = socket;
         in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
-        out.write(random_number);
+        out.write(1);
         out.flush();
         start();
     }
@@ -47,7 +47,9 @@ class MyServerRun extends Thread {
             while (!socket.isClosed()) {
                 str = in.readLine().toCharArray();
                 System.out.println(str);
-                send(str);
+                for (MyServerRun server : MyServer.serverList) {
+                    server.send(str);
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -61,6 +63,14 @@ class MyServerRun extends Thread {
                 in.close();
                 out.close();
             }
+        } catch (IOException ignored) {
+        }
+    }
+
+    private void sendWho(int p) {
+        try {
+            out.write(p);
+            out.flush();
         } catch (IOException ignored) {
         }
     }

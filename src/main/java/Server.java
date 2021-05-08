@@ -55,6 +55,7 @@ class ServerSomthing extends Thread {
         }
 
     }
+
     private void downService() {
         try {
             if (!socket.isClosed()) {

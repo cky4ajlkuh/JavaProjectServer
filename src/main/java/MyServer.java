@@ -6,10 +6,38 @@ public class MyServer {
 
     public static final int PORT = 9999;
     public static LinkedList<MyServerRun> serverList = new LinkedList<>();
+    public static final int random_number = (int) (Math.random() * 2);
+    private static int x = 0;
+    private static int y = 1;
+    public static char[] str;
 
     public static void main(String[] args) throws IOException {
         ServerSocket server = new ServerSocket(PORT);
+        System.out.println("Рандомный номер получается " + random_number);
         System.out.println("Server Started");
+       /* try {
+            for (int i = 0; serverList.size() != 2; i++) {
+                Socket socket = server.accept();
+                try {
+                    serverList.add(new MyServerRun(socket));
+                    if (random_number == 0) {
+                        serverList.get(i).sendWho(x);
+                        x++;
+                    }
+                    if (random_number == 1) {
+                        serverList.get(i).sendWho(y);
+                        y--;
+                    }
+                } catch (IOException | InterruptedException e) {
+                    socket.close();
+                }
+            }
+
+            while (true){
+
+            }
+        }*/
+
         try {
             while (serverList.size() < 2) {
                 Socket socket = server.accept();
@@ -19,44 +47,57 @@ public class MyServer {
                     socket.close();
                 }
             }
+            if (random_number == 0) {
+                serverList.get(0).sendWho(1);
+                serverList.get(1).sendWho(0);
+                while (true) {
+                    serverList.get(0).run();
+                    serverList.get(1).send(str);
+                    serverList.get(1).run();
+                    serverList.get(0).send(str);
+                }
+            }
+            if (random_number == 1) {
+                serverList.get(0).sendWho(0);
+                serverList.get(1).sendWho(1);
+                while (true) {
+                    serverList.get(1).run();
+                    serverList.get(0).send(str);
+                    serverList.get(0).run();
+                    serverList.get(1).send(str);
+                }
+            }
+
         } finally {
             server.close();
         }
     }
 }
 
-class MyServerRun extends Thread {
+class MyServerRun {
     private final Socket socket;
     private final BufferedReader in;
     private final BufferedWriter out;
-    int random_number = (int) (Math.random() * 2);
     char[] str;
 
     MyServerRun(Socket socket) throws IOException, InterruptedException {
         this.socket = socket;
         in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
-        out.write(1);
-        out.flush();
-        start();
+
     }
 
-    @Override
     public void run() {
         try {
             while (!socket.isClosed()) {
-                str = in.readLine().toCharArray();
-                System.out.println(str);
-                for (MyServerRun server : MyServer.serverList) {
-                    server.send(str);
-                }
+                MyServer.str = in.readLine().toCharArray();
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    private void downService() {
+    public void downService() {
         try {
             if (!socket.isClosed()) {
                 socket.close();
@@ -67,15 +108,12 @@ class MyServerRun extends Thread {
         }
     }
 
-    private void sendWho(int p) {
-        try {
-            out.write(p);
-            out.flush();
-        } catch (IOException ignored) {
-        }
+    public void sendWho(int p) throws IOException {
+        out.write(p);
+        out.flush();
     }
 
-    private void send(char[] array) {
+    public void send(char[] array) {
         try {
             String str = array[0] + " " + array[2] + " " + array[4];
             out.write(str + "\n");

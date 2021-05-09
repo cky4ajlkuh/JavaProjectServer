@@ -7,36 +7,12 @@ public class MyServer {
     public static final int PORT = 9999;
     public static LinkedList<MyServerRun> serverList = new LinkedList<>();
     public static final int random_number = (int) (Math.random() * 2);
-    private static int x = 0;
-    private static int y = 1;
     public static char[] str;
 
     public static void main(String[] args) throws IOException {
         ServerSocket server = new ServerSocket(PORT);
         System.out.println("Рандомный номер получается " + random_number);
         System.out.println("Server Started");
-       /* try {
-            for (int i = 0; serverList.size() != 2; i++) {
-                Socket socket = server.accept();
-                try {
-                    serverList.add(new MyServerRun(socket));
-                    if (random_number == 0) {
-                        serverList.get(i).sendWho(x);
-                        x++;
-                    }
-                    if (random_number == 1) {
-                        serverList.get(i).sendWho(y);
-                        y--;
-                    }
-                } catch (IOException | InterruptedException e) {
-                    socket.close();
-                }
-            }
-
-            while (true){
-
-            }
-        }*/
 
         try {
             while (serverList.size() < 2) {
@@ -50,7 +26,7 @@ public class MyServer {
             if (random_number == 0) {
                 serverList.get(0).sendWho(1);
                 serverList.get(1).sendWho(0);
-                while (true) {
+                while (!server.isClosed()) {
                     serverList.get(0).run();
                     serverList.get(1).send(str);
                     serverList.get(1).run();
@@ -60,7 +36,7 @@ public class MyServer {
             if (random_number == 1) {
                 serverList.get(0).sendWho(0);
                 serverList.get(1).sendWho(1);
-                while (true) {
+                while (!server.isClosed()) {
                     serverList.get(1).run();
                     serverList.get(0).send(str);
                     serverList.get(0).run();
@@ -78,7 +54,6 @@ class MyServerRun {
     private final Socket socket;
     private final BufferedReader in;
     private final BufferedWriter out;
-    char[] str;
 
     MyServerRun(Socket socket) throws IOException, InterruptedException {
         this.socket = socket;
@@ -89,9 +64,8 @@ class MyServerRun {
 
     public void run() {
         try {
-            while (!socket.isClosed()) {
-                MyServer.str = in.readLine().toCharArray();
-            }
+            MyServer.str = in.readLine().toCharArray();
+            System.out.println(MyServer.str);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -115,8 +89,8 @@ class MyServerRun {
 
     public void send(char[] array) {
         try {
-            String str = array[0] + " " + array[2] + " " + array[4];
-            out.write(str + "\n");
+            String str = array[0] + " " + array[2];
+            out.write(str + '\n');
             out.flush();
         } catch (IOException ignored) {
         }

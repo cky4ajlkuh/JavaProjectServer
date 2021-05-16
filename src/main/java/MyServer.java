@@ -1,3 +1,5 @@
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.net.*;
 import java.io.*;
 import java.util.LinkedList;
@@ -6,16 +8,15 @@ public class MyServer {
 
     public static final int PORT = 9999;
     public static LinkedList<MyServerRun> serverList = new LinkedList<>();
-    public static final int random_number = (int) (Math.random() * 2);
+    public static int random_number = (int) (Math.random() * 2);
     public static char[] str;
 
     public static void main(String[] args) throws IOException {
         ServerSocket server = new ServerSocket(PORT);
         System.out.println("Рандомный номер получается " + random_number);
         System.out.println("Server Started");
-
         try {
-            while (serverList.size() < 2) {
+            while (serverList.size() < 1) {
                 Socket socket = server.accept();
                 try {
                     serverList.add(new MyServerRun(socket));
@@ -25,22 +26,23 @@ public class MyServer {
             }
             if (random_number == 0) {
                 serverList.get(0).sendWho(1);
-                serverList.get(1).sendWho(0);
+                // serverList.get(1).sendWho(0);
                 while (!server.isClosed()) {
                     serverList.get(0).run();
-                    serverList.get(1).send(str);
-                    serverList.get(1).run();
+                    //  serverList.get(1).send(str);
+                    //  serverList.get(1).run();
                     serverList.get(0).send(str);
                 }
             }
             if (random_number == 1) {
                 serverList.get(0).sendWho(0);
-                serverList.get(1).sendWho(1);
+                //     serverList.get(1).sendWho(1);
                 while (!server.isClosed()) {
-                    serverList.get(1).run();
+                    // serverList.get(1).run();
+                    serverList.get(0).run();// этот метод над будет удалить, когда вернусь к 2-м игрокам
                     serverList.get(0).send(str);
                     serverList.get(0).run();
-                    serverList.get(1).send(str);
+                    //  serverList.get(1).send(str);
                 }
             }
 
@@ -64,8 +66,12 @@ class MyServerRun {
 
     public void run() {
         try {
-            MyServer.str = in.readLine().toCharArray();
-            System.out.println(MyServer.str);
+            String str = in.readLine();
+            StringReader reader = new StringReader(str);
+            ObjectMapper mapper = new ObjectMapper();
+            Sosiska cat = mapper.readValue(reader, Sosiska.class);
+            System.out.println(cat.getNumber() + "  " + cat.getValue());
+
         } catch (IOException e) {
             e.printStackTrace();
         }

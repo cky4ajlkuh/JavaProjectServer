@@ -1,4 +1,5 @@
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.thoughtworks.xstream.XStream;
 
 import java.net.*;
 import java.io.*;
@@ -9,14 +10,14 @@ public class MyServer {
     public static final int PORT = 9999;
     public static LinkedList<MyServerRun> serverList = new LinkedList<>();
     public static int random_number = (int) (Math.random() * 2);
-    public static char[] str;
+    public static LinkedList<Element> elements = new LinkedList<>();
 
     public static void main(String[] args) throws IOException {
         ServerSocket server = new ServerSocket(PORT);
         System.out.println("Рандомный номер получается " + random_number);
         System.out.println("Server Started");
         try {
-            while (serverList.size() < 1) {
+            while (serverList.size() < 2) {
                 Socket socket = server.accept();
                 try {
                     serverList.add(new MyServerRun(socket));
@@ -26,26 +27,24 @@ public class MyServer {
             }
             if (random_number == 0) {
                 serverList.get(0).sendWho(1);
-                // serverList.get(1).sendWho(0);
-                while (!server.isClosed()) {
+                serverList.get(1).sendWho(0);
+                while (!MyServerRun.socket.isClosed()) {
                     serverList.get(0).run();
-                    //  serverList.get(1).send(str);
-                    //  serverList.get(1).run();
-                    serverList.get(0).send(str);
+                    serverList.get(1).send();
+                    serverList.get(1).run();
+                    serverList.get(0).send();
                 }
             }
             if (random_number == 1) {
                 serverList.get(0).sendWho(0);
-                //     serverList.get(1).sendWho(1);
-                while (!server.isClosed()) {
-                    // serverList.get(1).run();
-                    serverList.get(0).run();// этот метод над будет удалить, когда вернусь к 2-м игрокам
-                    serverList.get(0).send(str);
+                serverList.get(1).sendWho(1);
+                while (!MyServerRun.socket.isClosed()) {
+                    serverList.get(1).run();
+                    serverList.get(0).send();
                     serverList.get(0).run();
-                    //  serverList.get(1).send(str);
+                    serverList.get(1).send();
                 }
             }
-
         } finally {
             server.close();
         }
@@ -53,15 +52,14 @@ public class MyServer {
 }
 
 class MyServerRun {
-    private final Socket socket;
+    public static Socket socket;
     private final BufferedReader in;
     private final BufferedWriter out;
 
     MyServerRun(Socket socket) throws IOException, InterruptedException {
-        this.socket = socket;
+        MyServerRun.socket = socket;
         in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
-
     }
 
     public void run() {
@@ -69,34 +67,26 @@ class MyServerRun {
             String str = in.readLine();
             StringReader reader = new StringReader(str);
             ObjectMapper mapper = new ObjectMapper();
-            Sosiska cat = mapper.readValue(reader, Sosiska.class);
-            System.out.println(cat.getNumber() + "  " + cat.getValue());
-
+            MyServer.elements.add(mapper.readValue(reader, Element.class));
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public void downService() {
-        try {
-            if (!socket.isClosed()) {
-                socket.close();
-                in.close();
-                out.close();
-            }
-        } catch (IOException ignored) {
-        }
-    }
-
     public void sendWho(int p) throws IOException {
-        out.write(p);
+
+        XStream xmlWriter = new XStream();
+        String xmlString = xmlWriter.toXML(p + "");
+        out.write(xmlString + '\n');
         out.flush();
     }
 
-    public void send(char[] array) {
+    public void send() {
         try {
-            String str = array[0] + " " + array[2];
-            out.write(str + '\n');
+            ObjectMapper mapper = new ObjectMapper();
+            StringWriter stringWriter = new StringWriter();
+            mapper.writeValue(stringWriter, MyServer.elements.getLast());
+            out.write(String.valueOf(stringWriter) + '\n');
             out.flush();
         } catch (IOException ignored) {
         }

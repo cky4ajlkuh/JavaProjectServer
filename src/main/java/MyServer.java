@@ -14,8 +14,6 @@ public class MyServer {
 
     public static void main(String[] args) throws IOException {
         ServerSocket server = new ServerSocket(PORT);
-        System.out.println("Рандомный номер получается " + random_number);
-        System.out.println("Server Started");
         try {
             while (serverList.size() < 2) {
                 Socket socket = server.accept();

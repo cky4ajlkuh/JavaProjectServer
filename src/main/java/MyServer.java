@@ -64,17 +64,18 @@ class MyServerRun {
 
     public void run() {
         try {
-            String str = in.readLine();
-            StringReader reader = new StringReader(str);
-            ObjectMapper mapper = new ObjectMapper();
-            MyServer.elements.add(mapper.readValue(reader, Element.class));
+            if (!socket.isClosed()) {
+                String str = in.readLine();
+                StringReader reader = new StringReader(str);
+                ObjectMapper mapper = new ObjectMapper();
+                MyServer.elements.add(mapper.readValue(reader, Element.class));
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     public void sendWho(int p) throws IOException {
-
         XStream xmlWriter = new XStream();
         String xmlString = xmlWriter.toXML(p + "");
         out.write(xmlString + '\n');

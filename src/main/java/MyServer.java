@@ -23,8 +23,7 @@ public class MyServer {
                 }
             }
             play();
-        } catch (Exception e) {
-            e.printStackTrace();
+        } finally {
             server.close();
         }
     }
@@ -34,7 +33,7 @@ public class MyServer {
         if (random_number == 0) {
             serverList.get(0).sendWho(1);
             serverList.get(1).sendWho(0);
-            while (!MyServerRun.socket.isClosed()) {
+            while (!serverList.get(0).socket.isClosed() && !serverList.get(1).socket.isClosed()) {
                 serverList.get(0).run();
                 serverList.get(1).send();
                 serverList.get(1).run();
@@ -44,12 +43,123 @@ public class MyServer {
         if (random_number == 1) {
             serverList.get(0).sendWho(0);
             serverList.get(1).sendWho(1);
-            while (!MyServerRun.socket.isClosed()) {
+            while (!serverList.get(0).socket.isClosed() & !serverList.get(1).socket.isClosed()) {
                 serverList.get(1).run();
                 serverList.get(0).send();
                 serverList.get(0).run();
                 serverList.get(1).send();
             }
+        }
+    }
+
+    public static void end(String str) {
+        serverList.get(0).sendWin(str);
+        serverList.get(1).sendWin(str);
+    }
+
+    public static void finish() {
+        if (elements.size() >= 5) {
+            for (int i = 0; i < elements.size(); i++) {
+                for (int j = 0; j < elements.size(); j++) {
+                    for (Element element : elements) {
+                        if (elements.get(i).getNumber() == 0) {
+                            if (elements.get(j).getNumber() == 3) {
+                                if (element.getNumber() == 6) {
+                                    if (elements.get(i).getValue() == 'X' && elements.get(j).getValue() == 'X' && element.getValue() == 'X') {
+                                        end("Крестики");
+                                    }
+                                    if (elements.get(i).getValue() == 'O' && elements.get(j).getValue() == 'O' && element.getValue() == 'O') {
+                                        end("Нолики");
+                                    }
+                                }
+                            }
+                            if (elements.get(j).getNumber() == 1) {
+                                if (element.getNumber() == 2) {
+                                    if (elements.get(i).getValue() == 'X' && elements.get(j).getValue() == 'X' && element.getValue() == 'X') {
+                                        end("Крестики");
+                                    }
+                                    if (elements.get(i).getValue() == 'O' && elements.get(j).getValue() == 'O' && element.getValue() == 'O') {
+                                        end("Нолики");
+                                    }
+                                }
+                            }
+                            if (elements.get(j).getNumber() == 4) {
+                                if (element.getNumber() == 8) {
+                                    if (elements.get(i).getValue() == 'X' && elements.get(j).getValue() == 'X' && element.getValue() == 'X') {
+                                        end("Крестики");
+                                    }
+                                    if (elements.get(i).getValue() == 'O' && elements.get(j).getValue() == 'O' && element.getValue() == 'O') {
+                                        end("Нолики");
+                                    }
+                                }
+                            }
+                        }
+                        if (elements.get(i).getNumber() == 1) {
+                            if (elements.get(j).getNumber() == 4) {
+                                if (element.getNumber() == 7) {
+                                    if (elements.get(i).getValue() == 'X' && elements.get(j).getValue() == 'X' && element.getValue() == 'X') {
+                                        end("Крестики");
+                                    }
+                                    if (elements.get(i).getValue() == 'O' && elements.get(j).getValue() == 'O' && element.getValue() == 'O') {
+                                        end("Нолики");
+                                    }
+                                }
+                            }
+                        }
+                        if (elements.get(i).getNumber() == 2) {
+                            if (elements.get(j).getNumber() == 5) {
+                                if (element.getNumber() == 8) {
+                                    if (elements.get(i).getValue() == 'X' && elements.get(j).getValue() == 'X' && element.getValue() == 'X') {
+                                        end("Крестики");
+                                    }
+                                    if (elements.get(i).getValue() == 'O' && elements.get(j).getValue() == 'O' && element.getValue() == 'O') {
+                                        end("Нолики");
+                                    }
+                                }
+                            }
+                        }
+                        if (elements.get(i).getNumber() == 5) {
+                            if (elements.get(j).getNumber() == 4) {
+                                if (element.getNumber() == 3) {
+                                    if (elements.get(i).getValue() == 'X' && elements.get(j).getValue() == 'X' && element.getValue() == 'X') {
+                                        end("Крестики");
+                                    }
+                                    if (elements.get(i).getValue() == 'O' && elements.get(j).getValue() == 'O' && element.getValue() == 'O') {
+                                        end("Нолики");
+                                    }
+                                }
+                            }
+                        }
+                        if (elements.get(i).getNumber() == 6) {
+                            if (elements.get(j).getNumber() == 7) {
+                                if (element.getNumber() == 8) {
+                                    if (elements.get(i).getValue() == 'X' && elements.get(j).getValue() == 'X' && element.getValue() == 'X') {
+                                        end("Крестики");
+                                    }
+                                    if (elements.get(i).getValue() == 'O' && elements.get(j).getValue() == 'O' && element.getValue() == 'O') {
+                                        end("Нолики");
+                                    }
+                                }
+                            }
+                        }
+                        if (elements.get(i).getNumber() == 2) {
+                            if (elements.get(j).getNumber() == 4) {
+                                if (element.getNumber() == 6) {
+                                    if (elements.get(i).getValue() == 'X' && elements.get(j).getValue() == 'X' && element.getValue() == 'X') {
+                                        end("Крестики");
+                                    }
+                                    if (elements.get(i).getValue() == 'O' && elements.get(j).getValue() == 'O' && element.getValue() == 'O') {
+                                        end("Нолики");
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        if (elements.size() == 9) {
+            end("Дружба");
         }
     }
 }
@@ -68,16 +178,11 @@ class MyServerRun {
     public void run() {
         try {
             if (!socket.isClosed()) {
+                MyServer.finish();
                 String str = in.readLine();
-                if (str.equals("return")) {
-                    MyServer.play();
-                    MyServer.elements.clear();
-                    System.out.println("траляля");
-                } else {
-                    StringReader reader = new StringReader(str);
-                    ObjectMapper mapper = new ObjectMapper();
-                    MyServer.elements.add(mapper.readValue(reader, Element.class));
-                }
+                StringReader reader = new StringReader(str);
+                ObjectMapper mapper = new ObjectMapper();
+                MyServer.elements.add(mapper.readValue(reader, Element.class));
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -97,6 +202,14 @@ class MyServerRun {
             StringWriter stringWriter = new StringWriter();
             mapper.writeValue(stringWriter, MyServer.elements.getLast());
             out.write(String.valueOf(stringWriter) + '\n');
+            out.flush();
+        } catch (IOException ignored) {
+        }
+    }
+
+    public void sendWin(String s) {
+        try {
+            out.write(s + '\n');
             out.flush();
         } catch (IOException ignored) {
         }

@@ -9,7 +9,6 @@ public class MyServer {
 
     public static final int PORT = 9999;
     public static LinkedList<MyServerRun> serverList = new LinkedList<>();
-    public static int random_number = (int) (Math.random() * 2);
     public static LinkedList<Element> elements = new LinkedList<>();
 
     public static void main(String[] args) throws IOException {
@@ -23,28 +22,34 @@ public class MyServer {
                     socket.close();
                 }
             }
-            if (random_number == 0) {
-                serverList.get(0).sendWho(1);
-                serverList.get(1).sendWho(0);
-                while (!MyServerRun.socket.isClosed()) {
-                    serverList.get(0).run();
-                    serverList.get(1).send();
-                    serverList.get(1).run();
-                    serverList.get(0).send();
-                }
-            }
-            if (random_number == 1) {
-                serverList.get(0).sendWho(0);
-                serverList.get(1).sendWho(1);
-                while (!MyServerRun.socket.isClosed()) {
-                    serverList.get(1).run();
-                    serverList.get(0).send();
-                    serverList.get(0).run();
-                    serverList.get(1).send();
-                }
-            }
-        } finally {
+            play();
+        } catch (Exception e) {
+            e.printStackTrace();
             server.close();
+        }
+    }
+
+    public static void play() throws IOException {
+        int random_number = (int) (Math.random() * 2);
+        if (random_number == 0) {
+            serverList.get(0).sendWho(1);
+            serverList.get(1).sendWho(0);
+            while (!MyServerRun.socket.isClosed()) {
+                serverList.get(0).run();
+                serverList.get(1).send();
+                serverList.get(1).run();
+                serverList.get(0).send();
+            }
+        }
+        if (random_number == 1) {
+            serverList.get(0).sendWho(0);
+            serverList.get(1).sendWho(1);
+            while (!MyServerRun.socket.isClosed()) {
+                serverList.get(1).run();
+                serverList.get(0).send();
+                serverList.get(0).run();
+                serverList.get(1).send();
+            }
         }
     }
 }
@@ -64,9 +69,15 @@ class MyServerRun {
         try {
             if (!socket.isClosed()) {
                 String str = in.readLine();
-                StringReader reader = new StringReader(str);
-                ObjectMapper mapper = new ObjectMapper();
-                MyServer.elements.add(mapper.readValue(reader, Element.class));
+                if (str.equals("return")) {
+                    MyServer.play();
+                    MyServer.elements.clear();
+                    System.out.println("траляля");
+                } else {
+                    StringReader reader = new StringReader(str);
+                    ObjectMapper mapper = new ObjectMapper();
+                    MyServer.elements.add(mapper.readValue(reader, Element.class));
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();

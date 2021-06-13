@@ -65,11 +65,15 @@ public class MyServer {
 
     public static void replay() throws IOException {
         if (!finish) {
-            boolean first = serverList.get(0).playAgain();
-            boolean second = serverList.get(1).playAgain();
-            if (first && second) {
-                finish = true;
-                play();
+            boolean first = false;
+            boolean second = false;
+            first = serverList.get(0).playAgain();
+            second = serverList.get(1).playAgain();
+            if (first) {
+                if (second) {
+                    finish = true;
+                    play();
+                }
             }
         }
     }

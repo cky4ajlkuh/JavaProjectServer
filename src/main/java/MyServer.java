@@ -23,8 +23,10 @@ public class MyServer {
                     socket.close();
                 }
             }
-            play();
-            replay();
+            while (serverList.get(0).checkConnect() | serverList.get(1).checkConnect()) {
+                play();
+                replay();
+            }
         } catch (IOException e) {
             e.printStackTrace();
             server.close();
@@ -32,6 +34,7 @@ public class MyServer {
     }
 
     public static void play() throws IOException {
+        elements.clear();
         if (finish) {
             int random_number = (int) (Math.random() * 2);
             if (random_number == 0) {
@@ -58,7 +61,7 @@ public class MyServer {
     }
 
     public static void replay() throws IOException {
-        while (!finish) {
+        if (!finish) {
             boolean first = serverList.get(0).playAgain();
             boolean second = serverList.get(1).playAgain();
             if (first && second) {
@@ -66,8 +69,6 @@ public class MyServer {
                 System.out.println("реплей сработал");
                 play();
                 System.out.println("конец реплеяяяяяяяяя");
-                first = false;
-                second = false;
             }
         }
     }
@@ -76,7 +77,6 @@ public class MyServer {
         serverList.get(0).sendWin(str);
         serverList.get(1).sendWin(str);
         finish = false;
-        elements.clear();
     }
 
     public static void finish() {
@@ -115,7 +115,6 @@ public class MyServer {
             }
             if (elements.size() == 9) {
                 end("Дружба");
-                elements.clear();
             }
         }
 
@@ -135,13 +134,14 @@ class MyServerRun {
 
     public void run() {
         try {
-            if (MyServer.finish) {
+            if (MyServer.finish && !socket.isClosed()) {
                 MyServer.finish();
                 String str = in.readLine();
                 if (str != null && !str.equals("replay")) {
                     StringReader reader = new StringReader(str);
                     ObjectMapper mapper = new ObjectMapper();
                     MyServer.elements.add(mapper.readValue(reader, Element.class));
+                    System.out.println(str);
                 }
             }
         } catch (IOException e) {
@@ -164,6 +164,7 @@ class MyServerRun {
                 mapper.writeValue(stringWriter, MyServer.elements.getLast());
                 out.write(String.valueOf(stringWriter) + '\n');
                 out.flush();
+                System.out.println(stringWriter);
             }
         } catch (IOException ignored) {
         }
@@ -191,5 +192,9 @@ class MyServerRun {
             e.printStackTrace();
         }
         return false;
+    }
+
+    public static boolean checkConnect() {
+        return !socket.isClosed();
     }
 }

@@ -23,9 +23,12 @@ public class MyServer {
                     socket.close();
                 }
             }
-            while (serverList.get(0).checkConnect() | serverList.get(1).checkConnect()) {
+            while (MyServerRun.checkConnect()) {
                 play();
                 replay();
+            }
+            if (!MyServerRun.checkConnect()) {
+                server.close();
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -66,9 +69,7 @@ public class MyServer {
             boolean second = serverList.get(1).playAgain();
             if (first && second) {
                 finish = true;
-                System.out.println("реплей сработал");
                 play();
-                System.out.println("конец реплеяяяяяяяяя");
             }
         }
     }
@@ -134,14 +135,21 @@ class MyServerRun {
 
     public void run() {
         try {
-            if (MyServer.finish && !socket.isClosed()) {
+            if (MyServer.finish) {
                 MyServer.finish();
-                String str = in.readLine();
-                if (str != null && !str.equals("replay")) {
-                    StringReader reader = new StringReader(str);
-                    ObjectMapper mapper = new ObjectMapper();
-                    MyServer.elements.add(mapper.readValue(reader, Element.class));
-                    System.out.println(str);
+                if (checkConnect()) {
+                    String str = in.readLine();
+                    if (str != null && !str.equals("replay")) {
+                        if (str.equals("close")) {
+                            socket.close();
+                            out.close();
+                            in.close();
+                        } else {
+                            StringReader reader = new StringReader(str);
+                            ObjectMapper mapper = new ObjectMapper();
+                            MyServer.elements.add(mapper.readValue(reader, Element.class));
+                        }
+                    }
                 }
             }
         } catch (IOException e) {
@@ -150,21 +158,24 @@ class MyServerRun {
     }
 
     public void sendWho(int p) throws IOException {
-        XStream xmlWriter = new XStream();
-        String xmlString = xmlWriter.toXML(p + "");
-        out.write(xmlString + '\n');
-        out.flush();
+        if (checkConnect()) {
+            XStream xmlWriter = new XStream();
+            String xmlString = xmlWriter.toXML(p + "");
+            out.write(xmlString + '\n');
+            out.flush();
+        }
     }
 
     public void send() {
         try {
-            if (MyServer.finish && !MyServer.elements.isEmpty()) {
-                ObjectMapper mapper = new ObjectMapper();
-                StringWriter stringWriter = new StringWriter();
-                mapper.writeValue(stringWriter, MyServer.elements.getLast());
-                out.write(String.valueOf(stringWriter) + '\n');
-                out.flush();
-                System.out.println(stringWriter);
+            if (checkConnect()) {
+                if (MyServer.finish && !MyServer.elements.isEmpty()) {
+                    ObjectMapper mapper = new ObjectMapper();
+                    StringWriter stringWriter = new StringWriter();
+                    mapper.writeValue(stringWriter, MyServer.elements.getLast());
+                    out.write(String.valueOf(stringWriter) + '\n');
+                    out.flush();
+                }
             }
         } catch (IOException ignored) {
         }
@@ -172,19 +183,23 @@ class MyServerRun {
 
     public void sendWin(String s) {
         try {
-            out.write(s + '\n');
-            out.flush();
+            if (checkConnect()) {
+                out.write(s + '\n');
+                out.flush();
+            }
         } catch (IOException ignored) {
         }
     }
 
     public boolean playAgain() {
         try {
-            while (!MyServer.finish) {
-                String str = in.readLine();
-                if (str != null) {
-                    if (str.equals("replay")) {
-                        return true;
+            if (checkConnect()) {
+                while (!MyServer.finish) {
+                    String str = in.readLine();
+                    if (str != null) {
+                        if (str.equals("replay")) {
+                            return true;
+                        }
                     }
                 }
             }
